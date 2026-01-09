@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glücksrad - Entscheidungen leicht gemacht</title>
+    <meta name="description" content="Kostenloses Online-Glücksrad für zufällige Entscheidungen. Füge deine eigenen Optionen hinzu und lass das Rad entscheiden!">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Google AdSense wird nur geladen wenn du eine echte Publisher-ID hast -->
+    <!-- WICHTIG: Entferne die nächsten 4 Zeilen komplett, bis du AdSense eingerichtet hast! -->
+    <!-- 
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+         crossorigin="anonymous"></script>
+    -->
+</head>
+<body>
+    <div class="theme-toggle">
+        <button id="themeToggle" aria-label="Theme wechseln">
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🎡 Glücksrad</h1>
+            <p class="subtitle">Lass das Schicksal entscheiden!</p>
+        </header>
+
+        <!-- AdSense Top Banner - Nur aktivieren wenn AdSense eingerichtet ist -->
+        <!-- 
+        <div class="ad-container ad-top">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                 data-ad-slot="1234567890"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+        </div>
+        -->
+
+        <div class="main-content">
+            <div class="wheel-section">
+                <div class="wheel-container">
+                    <div class="wheel-pointer"></div>
+                    <canvas id="wheelCanvas" width="500" height="500"></canvas>
+                    <button id="spinBtn" class="spin-button">
+                        <span class="spin-text">DREHEN</span>
+                    </button>
+                </div>
+                <div class="result-display" id="resultDisplay"></div>
+                
+                <!-- AdSense Wheel Ad - Nur aktivieren wenn AdSense eingerichtet ist -->
+                <!-- 
+                <div class="ad-container ad-wheel">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                         data-ad-slot="0987654321"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                </div>
+                -->
+            </div>
+
+            <div class="controls-section">
+                <div class="card">
+                    <h2>Optionen hinzufügen</h2>
+                    <div class="input-group">
+                        <input type="text" id="optionInput" placeholder="Neue Option eingeben..." maxlength="50">
+                        <button id="addBtn" class="btn btn-primary">Hinzufügen</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Aktionen</h2>
+                    <div class="action-buttons">
+                        <button id="shuffleBtn" class="btn btn-secondary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="16 3 21 3 21 8"></polyline>
+                                <line x1="4" y1="20" x2="21" y2="3"></line>
+                                <polyline points="21 16 21 21 16 21"></polyline>
+                                <line x1="15" y1="15" x2="21" y2="21"></line>
+                                <line x1="4" y1="4" x2="9" y2="9"></line>
+                            </svg>
+                            Mischen
+                        </button>
+                        <button id="clearBtn" class="btn btn-danger">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            Alle löschen
+                        </button>
+                    </div>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="autoRemove" checked>
+                            <span>Automatisch entfernen nach Drehen</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Optionen (<span id="optionCount">0</span>)</h2>
+                    <div id="optionsList" class="options-list"></div>
+                </div>
+
+                <!-- AdSense Sidebar Ad - Nur aktivieren wenn AdSense eingerichtet ist -->
+                <!-- 
+                <div class="ad-container ad-sidebar">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                         data-ad-slot="1122334455"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                </div>
+                -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="impressum.html" class="footer-link">Impressum</a>
+                <span class="footer-separator">·</span>
+                <a href="datenschutz.html" class="footer-link">Datenschutz</a>
+            </div>
+            <div class="footer-copyright">
+                © 2026 Glücksrad · powered by <a href="https://frame-sphere.vercel.app" class="footer-link">FrameSphere</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AdSense Initialisierung - Nur aktivieren wenn AdSense eingerichtet ist -->
+    <!-- 
+    <script>
+        window.addEventListener('load', function() {
+            if (typeof adsbygoogle !== 'undefined') {
+                try {
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                } catch (e) {
+                    console.log('AdSense konnte nicht geladen werden:', e);
+                }
+            }
+        });
+    </script>
+    -->
+    
+    <script src="script.js"></script>
+</body>
+</html>

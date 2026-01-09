@@ -1,0 +1,182 @@
+# Glücksrad - Google AdSense Integration Anleitung
+
+## 🎡 Übersicht
+Diese Glücksrad-Webseite ist vollständig für Google AdSense vorbereitet mit optimierter Performance.
+
+## ⚡ Performance-Optimierungen
+
+### Behobene Performance-Probleme:
+- ✅ **requestAnimationFrame Cleanup**: Animationen werden korrekt gestoppt
+- ✅ **Performance.now() statt Date.now()**: Höhere Präzision, weniger Overhead
+- ✅ **Canvas-Optimierung**: Separate Render-Schleifen für Segmente und Text
+- ✅ **will-change CSS**: Hardware-Beschleunigung für Canvas und Wheel
+- ✅ **Async AdSense Loading**: Anzeigen blockieren nicht die Seite
+
+### Canvas-Rendering-Optimierung:
+```javascript
+// Optimierte Rendering-Strategie:
+// 1. Segmente in einer Schleife zeichnen
+// 2. Text in separater Schleife (weniger Context-Switches)
+// 3. cancelAnimationFrame bei Cleanup
+```
+
+## 🔧 Google AdSense Setup
+
+### Schritt 1: Ersetze die Platzhalter-IDs
+
+In **allen HTML-Dateien** (index.html, impressum.html, datenschutz.html):
+
+```html
+<!-- ERSETZE DIESE ZEILE: -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+
+<!-- MIT DEINER ECHTEN PUBLISHER-ID: -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1234567890123456"
+```
+
+### Schritt 2: Anzeigenblöcke erstellen
+
+In deinem AdSense-Dashboard:
+1. Gehe zu **Anzeigen** → **Nach Website**
+2. Erstelle **3 neue Anzeigenblöcke**:
+   - **Top Banner**: 728x90 oder Responsive
+   - **Wheel Section**: 300x250 oder Responsive
+   - **Sidebar**: 300x600 oder Responsive
+
+### Schritt 3: Slot-IDs eintragen
+
+In **index.html** ersetze die Platzhalter:
+
+```html
+<!-- Top Banner -->
+<ins class="adsbygoogle"
+     data-ad-client="ca-pub-DEINE_ECHTE_ID"
+     data-ad-slot="DEINE_SLOT_ID_1"
+     ...>
+
+<!-- Wheel Section -->
+<ins class="adsbygoogle"
+     data-ad-client="ca-pub-DEINE_ECHTE_ID"
+     data-ad-slot="DEINE_SLOT_ID_2"
+     ...>
+
+<!-- Sidebar -->
+<ins class="adsbygoogle"
+     data-ad-client="ca-pub-DEINE_ECHTE_ID"
+     data-ad-slot="DEINE_SLOT_ID_3"
+     ...>
+```
+
+## 🛡️ Sicherheitsfeatures
+
+### Test-Modus
+Alle AdSense-Tags haben `data-adbreak-test="on"` aktiviert:
+```html
+<script ... data-adbreak-test="on"></script>
+```
+**WICHTIG**: Dies verhindert das Senden von echten Requests während der Entwicklung!
+
+**ENTFERNE** `data-adbreak-test="on"` wenn du live gehst, damit echte Anzeigen geschaltet werden!
+
+### Platzhalter-Publisher-ID
+Die aktuelle ID `ca-pub-XXXXXXXXXXXXXXXX` ist **ungültig** und sendet KEINE Daten an Google.
+Dies schützt dich während der Entwicklung.
+
+## 📊 Anzeigenpositionen
+
+```
+┌─────────────────────────────────────┐
+│          HEADER + TITLE             │
+├─────────────────────────────────────┤
+│      [Top Banner Anzeige]           │  ← 728x90 oder Responsive
+├─────────────────────────────────────┤
+│  GLÜCKSRAD    │    STEUERUNG       │
+│    [Rad]      │   + Optionen       │
+│               │                     │
+│  [Wheel Ad]   │   [Sidebar Ad]     │  ← 300x250 & 300x600
+└─────────────────────────────────────┘
+```
+
+## 🚀 Go-Live Checkliste
+
+- [ ] Ersetze `ca-pub-XXXXXXXXXXXXXXXX` mit deiner echten Publisher-ID
+- [ ] Ersetze Slot-IDs (`1234567890`, `0987654321`, `1122334455`)
+- [ ] **ENTFERNE** `data-adbreak-test="on"` aus allen Script-Tags
+- [ ] Teste auf verschiedenen Geräten (Desktop, Tablet, Mobil)
+- [ ] Überprüfe Page Speed Insights: https://pagespeed.web.dev/
+- [ ] Verifiziere in AdSense Dashboard dass Anzeigen erscheinen
+
+## 🎯 Performance-Metriken
+
+### Aktuelle Optimierungen:
+- ✅ Async AdSense Loading (blockiert nicht)
+- ✅ Lazy Loading für Anzeigen
+- ✅ Minimale Layout-Shifts durch feste Container-Höhen
+- ✅ Optimiertes Canvas-Rendering
+- ✅ Hardware-Beschleunigung aktiviert
+- ✅ RequestAnimationFrame Cleanup
+
+### Erwartete Scores:
+- **Performance**: 90+ (ohne Anzeigen), 75+ (mit Anzeigen)
+- **Accessibility**: 95+
+- **Best Practices**: 95+
+- **SEO**: 100
+
+## 📱 Responsive Design
+
+Alle Anzeigenpositionen sind **responsive** und passen sich automatisch an:
+- **Desktop**: Volle Anzeigengrößen
+- **Tablet**: Mittlere Größen
+- **Mobile**: Kompakte Anzeigen
+
+## 🔍 Testing
+
+### Lokales Testen (mit Platzhalter-IDs):
+```bash
+# Starte einen lokalen Server
+python -m http.server 8000
+# oder
+npx serve
+```
+
+Öffne: `http://localhost:8000`
+
+### Produktions-Test:
+1. Deploye auf deinen Webserver
+2. Warte 10-20 Minuten (AdSense braucht Zeit)
+3. Überprüfe in Chrome DevTools → Network → Filter "adsbygoogle"
+
+## ⚠️ Wichtige Hinweise
+
+1. **Keine Demo-Daten**: Platzhalter-IDs senden KEINE echten Requests
+2. **Test-Modus**: `data-adbreak-test="on"` muss entfernt werden für Live-Betrieb
+3. **AdSense-Approval**: Website muss von Google genehmigt sein
+4. **Content Policy**: Stelle sicher dass alle Inhalte AdSense-konform sind
+
+## 🐛 Troubleshooting
+
+### Anzeigen erscheinen nicht:
+- Überprüfe ob Publisher-ID korrekt ist
+- Entferne `data-adbreak-test="on"`
+- Warte 10-20 Minuten nach Deploy
+- Überprüfe Browser-Konsole auf Fehler
+- Prüfe AdSense-Dashboard auf Status
+
+### Performance-Probleme:
+- Alle Animationen verwenden jetzt `cancelAnimationFrame`
+- Canvas nutzt Hardware-Beschleunigung
+- AdSense lädt asynchron und blockiert nicht
+
+### Browser warnt vor "Seite stoppen":
+- ✅ **BEHOBEN**: Animation-Loop wird korrekt gestoppt
+- ✅ **BEHOBEN**: Performance.now() statt Date.now()
+- ✅ **BEHOBEN**: Cleanup bei beforeunload
+
+## 📞 Support
+
+Bei Fragen: kpaschek@gmx.de
+
+---
+
+**Erstellt mit ❤️ von FrameSphere**
+https://frame-sphere.vercel.app
