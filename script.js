@@ -435,11 +435,12 @@ window.addEventListener('pagehide', () => {
 initTheme();
 loadFromLocalStorage();
 
+
 // Standardoptionen wenn leer
-if (options.length === 0) {
-    ['Pizza', 'Burger', 'Pasta', 'Sushi', 'Salat', 'Steak'].forEach(option => {
-        addOption(option);
-    });
-}
+//if (options.length === 0) {
+    //['Pizza', 'Burger', 'Pasta', 'Sushi', 'Salat', 'Steak'].forEach(option => {
+        //addOption(option);
+    //});
+//}
 
 updateUI();
