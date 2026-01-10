@@ -18,6 +18,8 @@ const clearBtn = document.getElementById('clearBtn');
 const autoRemove = document.getElementById('autoRemove');
 const resultDisplay = document.getElementById('resultDisplay');
 const themeToggle = document.getElementById('themeToggle');
+const langToggle = document.getElementById('langToggle');
+const langDropdown = document.getElementById('langDropdown');
 
 // Theme Verwaltung
 function initTheme() {
@@ -31,6 +33,28 @@ themeToggle.addEventListener('click', () => {
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
     drawWheel();
+});
+
+// Sprach-Dropdown
+langToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    langDropdown.classList.toggle('hidden');
+});
+
+// Sprache wechseln
+document.querySelectorAll('.lang-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const lang = btn.getAttribute('data-lang');
+        window.i18n.setLanguage(lang);
+        langDropdown.classList.add('hidden');
+    });
+});
+
+// Dropdown schließen beim Klick außerhalb
+document.addEventListener('click', (e) => {
+    if (!langToggle.contains(e.target) && !langDropdown.contains(e.target)) {
+        langDropdown.classList.add('hidden');
+    }
 });
 
 // Farben für die Segmente
@@ -52,18 +76,16 @@ function addOption(text) {
     };
     
     options.push(option);
-    lastDrawnRotation = -1; // BUGFIX: Force sofortigen Redraw
     updateUI();
     saveToLocalStorage();
 }
 
 // Option entfernen
 function removeOption(id) {
-    // Wichtig: Nicht während des Spinnens entfernen (außer Auto-Remove)
     if (isSpinning) return;
     
     options = options.filter(opt => opt.id !== id);
-    lastDrawnRotation = -1; // Force redraw
+    lastDrawnRotation = -1;
     updateUI();
     saveToLocalStorage();
 }
@@ -86,7 +108,7 @@ function renderOptionsList() {
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
                 </svg>
-                <p>Keine Optionen vorhanden.<br>Füge mindestens 2 Optionen hinzu!</p>
+                <p>${window.i18n.t('empty-state')}</p>
             </div>
         `;
         return;
@@ -117,7 +139,6 @@ function escapeHtml(text) {
 
 // Rad zeichnen (MAXIMAL OPTIMIERT)
 function drawWheel() {
-    // Verhindere unnötige Redraws
     if (lastDrawnRotation === currentRotation && options.length > 0 && !isSpinning) return;
     lastDrawnRotation = currentRotation;
     
@@ -125,11 +146,9 @@ function drawWheel() {
     const centerY = canvas.height / 2;
     const radius = canvas.width / 2 - 10;
     
-    // Canvas leeren
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     if (options.length === 0) {
-        // Leeres Rad
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
         const theme = document.documentElement.getAttribute('data-theme');
@@ -143,13 +162,12 @@ function drawWheel() {
         ctx.font = 'bold 20px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('Füge Optionen hinzu', centerX, centerY);
+        ctx.fillText(window.i18n.t('canvas-empty'), centerX, centerY);
         return;
     }
     
     const anglePerSegment = (2 * Math.PI) / options.length;
     
-    // Batch-Rendering für bessere Performance
     ctx.save();
     
     // Alle Segmente zeichnen
@@ -158,7 +176,6 @@ function drawWheel() {
         const startAngle = currentRotation + (i * anglePerSegment);
         const endAngle = startAngle + anglePerSegment;
         
-        // Segment
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
         ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -170,7 +187,7 @@ function drawWheel() {
         ctx.stroke();
     }
     
-    // Alle Texte zeichnen (separate Schleife)
+    // Alle Texte zeichnen
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 16px Arial';
     ctx.textAlign = 'center';
@@ -203,11 +220,10 @@ function drawWheel() {
     ctx.restore();
 }
 
-// Rad drehen (OPTIMIERT)
+// Rad drehen
 function spinWheel() {
     if (isSpinning || options.length < 2) return;
     
-    // Vorherige Animation stoppen
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
@@ -234,7 +250,6 @@ function spinWheel() {
     function animate(currentTime) {
         const timeSinceLastUpdate = currentTime - lastUpdateTime;
         
-        // Frame-Throttling für konstante Performance
         if (timeSinceLastUpdate < frameTime) {
             animationFrameId = requestAnimationFrame(animate);
             return;
@@ -245,7 +260,6 @@ function spinWheel() {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / spinDuration, 1);
         
-        // Easing function
         const easeOut = 1 - Math.pow(1 - progress, 3.5);
         currentRotation = startRotation + totalRotation * easeOut;
         
@@ -262,63 +276,34 @@ function spinWheel() {
     animationFrameId = requestAnimationFrame(animate);
 }
 
-// BUGFIX: Korrigierte Gewinner-Berechnung
+// Gewinner ermitteln
 function finishSpin() {
     isSpinning = false;
     spinBtn.disabled = false;
     
-    // Normalisiere die Rotation auf 0-2π
     const normalizedRotation = ((currentRotation % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-    
-    // Berechne die Winkelgröße pro Segment
     const anglePerSegment = (2 * Math.PI) / options.length;
-    
-    // BUGFIX: Der Zeiger zeigt nach OBEN (bei -π/2 bzw. 270° im Canvas-Koordinatensystem)
-    // Canvas startet bei 0° rechts und geht im Uhrzeigersinn
-    // Unser Zeiger ist aber oben, das entspricht -π/2 (oder 3π/2)
-    
-    // Der Zeiger zeigt nach oben (90° gegen Uhrzeigersinn von rechts)
-    // Im Canvas-System ist das bei Winkel = -π/2 bzw. 3π/2
-    const pointerAngle = Math.PI * 1.5; // 270° = oben
-    
-    // Berechne den Winkel relativ zum Zeiger
-    // Wir müssen schauen, welches Segment unter dem Zeiger liegt
-    let relativeAngle = (pointerAngle - normalizedRotation) % (2 * Math.PI);
-    if (relativeAngle < 0) relativeAngle += 2 * Math.PI;
-    
-    // Finde das Segment
-    let winningIndex = Math.floor(relativeAngle / anglePerSegment);
-    
-    // Stelle sicher, dass der Index im gültigen Bereich liegt
+    let pointerAngle = (2 * Math.PI - normalizedRotation) % (2 * Math.PI);
+    let winningIndex = Math.floor(pointerAngle / anglePerSegment);
     winningIndex = winningIndex % options.length;
-    if (winningIndex < 0) winningIndex = 0;
+    
+    if (winningIndex < 0 || winningIndex >= options.length) {
+        winningIndex = 0;
+    }
     
     const winner = options[winningIndex];
     
-    console.log('DEBUG Gewinner-Berechnung:', {
-        currentRotation: (currentRotation * 180 / Math.PI).toFixed(2) + '°',
-        normalizedRotation: (normalizedRotation * 180 / Math.PI).toFixed(2) + '°',
-        pointerAngle: (pointerAngle * 180 / Math.PI).toFixed(2) + '°',
-        relativeAngle: (relativeAngle * 180 / Math.PI).toFixed(2) + '°',
-        anglePerSegment: (anglePerSegment * 180 / Math.PI).toFixed(2) + '°',
-        winningIndex,
-        winner: winner.text,
-        totalOptions: options.length
-    });
-    
     // Ergebnis anzeigen
-    resultDisplay.textContent = `🎉 ${winner.text}`;
+    resultDisplay.textContent = `${window.i18n.t('result-prefix')}${winner.text}`;
     resultDisplay.style.background = winner.color;
     resultDisplay.style.color = '#ffffff';
     resultDisplay.classList.add('show');
     
-    // BUGFIX: Automatisches Entfernen mit Verzögerung und Sicherheitscheck
+    // Auto-Remove
     if (autoRemove.checked && winner && winner.id) {
         setTimeout(() => {
-            // Nochmal prüfen ob die Option noch existiert (könnte manuell gelöscht worden sein)
             const stillExists = options.find(opt => opt.id === winner.id);
             if (stillExists) {
-                // Temporär isSpinning auf false setzen um Löschen zu erlauben
                 const wasSpinning = isSpinning;
                 isSpinning = false;
                 removeOption(winner.id);
@@ -337,7 +322,7 @@ function shuffleOptions() {
         [options[i], options[j]] = [options[j], options[i]];
     }
     
-    lastDrawnRotation = -1; // Force redraw
+    lastDrawnRotation = -1;
     updateUI();
     saveToLocalStorage();
 }
@@ -346,7 +331,7 @@ function shuffleOptions() {
 function clearAllOptions() {
     if (isSpinning) return;
     
-    if (options.length > 0 && !confirm('Möchtest du wirklich alle Optionen löschen?')) {
+    if (options.length > 0 && !confirm(window.i18n.t('confirm-clear'))) {
         return;
     }
     
@@ -359,7 +344,7 @@ function clearAllOptions() {
     saveToLocalStorage();
 }
 
-// LocalStorage (mit Error Handling)
+// LocalStorage
 function saveToLocalStorage() {
     try {
         localStorage.setItem('wheelOptions', JSON.stringify(options));
@@ -406,7 +391,13 @@ optionInput.addEventListener('keypress', (e) => {
 shuffleBtn.addEventListener('click', shuffleOptions);
 clearBtn.addEventListener('click', clearAllOptions);
 
-// Cleanup bei Seitenwechsel und Visibility Change
+// Sprache geändert - UI aktualisieren
+window.addEventListener('languageChanged', () => {
+    updateUI();
+    drawWheel();
+});
+
+// Cleanup
 window.addEventListener('beforeunload', () => {
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
@@ -423,7 +414,6 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-// Prevent memory leaks
 window.addEventListener('pagehide', () => {
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
@@ -433,14 +423,15 @@ window.addEventListener('pagehide', () => {
 
 // Initialisierung
 initTheme();
+window.i18n.initLanguage();
 loadFromLocalStorage();
 
-
 // Standardoptionen wenn leer
-//if (options.length === 0) {
-    //['Pizza', 'Burger', 'Pasta', 'Sushi', 'Salat', 'Steak'].forEach(option => {
-        //addOption(option);
-    //});
-//}
+if (options.length === 0) {
+    const defaultOptions = window.i18n.t('default-options');
+    defaultOptions.forEach(option => {
+        addOption(option);
+    });
+}
 
 updateUI();
