@@ -287,17 +287,42 @@ function finishSpin() {
     isSpinning = false;
     spinBtn.disabled = false;
     
-    const normalizedRotation = ((currentRotation % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-    const anglePerSegment = (2 * Math.PI) / options.length;
-    let pointerAngle = (2 * Math.PI - normalizedRotation) % (2 * Math.PI);
-    let winningIndex = Math.floor(pointerAngle / anglePerSegment);
-    winningIndex = winningIndex % options.length;
+    // Der Pfeil zeigt nach OBEN (270° oder -90° oder 3π/2)
+    // Im Canvas-Koordinatensystem ist 0° rechts, 90° unten, 180° links, 270° oben
+    const pointerPosition = -Math.PI / 2; // Pfeil zeigt nach oben
     
-    if (winningIndex < 0 || winningIndex >= options.length) {
-        winningIndex = 0;
+    // Normalisiere die aktuelle Rotation
+    const normalizedRotation = ((currentRotation % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+    
+    // Berechne welches Segment unter dem Pfeil ist
+    // Subtrahiere die Rotation vom Pfeil-Winkel
+    let angleUnderPointer = pointerPosition - normalizedRotation;
+    
+    // Normalisiere auf 0 bis 2π
+    angleUnderPointer = ((angleUnderPointer % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+    
+    // Berechne den Index
+    const anglePerSegment = (2 * Math.PI) / options.length;
+    let winningIndex = Math.floor(angleUnderPointer / anglePerSegment);
+    
+    // Sicherheitscheck
+    winningIndex = winningIndex % options.length;
+    if (winningIndex < 0) {
+        winningIndex = options.length + winningIndex;
     }
     
     const winner = options[winningIndex];
+    
+    console.log('DEBUG Gewinner-Berechnung:', {
+        pointerPosition: (pointerPosition * 180 / Math.PI).toFixed(2) + '°',
+        currentRotation: (currentRotation * 180 / Math.PI).toFixed(2) + '°',
+        normalizedRotation: (normalizedRotation * 180 / Math.PI).toFixed(2) + '°',
+        angleUnderPointer: (angleUnderPointer * 180 / Math.PI).toFixed(2) + '°',
+        anglePerSegment: (anglePerSegment * 180 / Math.PI).toFixed(2) + '°',
+        winningIndex,
+        winner: winner.text,
+        totalOptions: options.length
+    });
     
     // Ergebnis anzeigen
     resultDisplay.textContent = `${window.i18n.t('result-prefix')}${winner.text}`;
