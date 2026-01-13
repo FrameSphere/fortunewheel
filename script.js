@@ -326,28 +326,9 @@ function finishSpin() {
     
     // Ergebnis anzeigen mit Icon
     const winnerIcon = `
-        <svg xmlns="http://www.w3.org/2000/svg"
-            width="32" height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            style="flex-shrink: 0;">
-
-        <!-- Party popper cone -->
-        <path d="M3 21l7-7 11 4-4 3-3 4z"></path>
-
-        <!-- Confetti lines -->
-        <line x1="14" y1="3" x2="14" y2="7"></line>
-        <line x1="18" y1="5" x2="20" y2="7"></line>
-        <line x1="10" y1="5" x2="8" y2="7"></line>
-
-        <!-- Confetti dots -->
-        <circle cx="18" cy="10" r="1"></circle>
-        <circle cx="12" cy="9" r="1"></circle>
-        </svg>
+    <svg xmlns="www.w3.org" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-10l2-2h4l-2 2-2 2-2-2zm2 2h-4l2 2 2-2z"/>
+    </svg>
     `;
     resultDisplay.innerHTML = `${winnerIcon}<span style="margin-left: 12px;">${escapeHtml(winner.text)}</span>`;
     resultDisplay.style.display = 'flex';
