@@ -1,0 +1,10 @@
+# robots.txt für SpinSelector
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://spinselector.pages.dev/sitemap.xml
+
+# Crawl-delay (optional, für höfliches Crawling)
+Crawl-delay: 1

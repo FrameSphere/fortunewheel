@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    
+    <!-- Hauptseite -->
+    <url>
+        <loc>https://spinselector.pages.dev/</loc>
+        <lastmod>2026-01-14</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+        <xhtml:link rel="alternate" hreflang="en" href="https://spinselector.pages.dev/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://spinselector.pages.dev/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://spinselector.pages.dev/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://spinselector.pages.dev/"/>
+    </url>
+    
+    <!-- Impressum -->
+    <url>
+        <loc>https://spinselector.pages.dev/impressum.html</loc>
+        <lastmod>2026-01-14</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.3</priority>
+    </url>
+    
+    <!-- Datenschutz -->
+    <url>
+        <loc>https://spinselector.pages.dev/datenschutz.html</loc>
+        <lastmod>2026-01-14</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.3</priority>
+    </url>
+    
+</urlset>
