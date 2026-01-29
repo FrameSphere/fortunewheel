@@ -4,6 +4,7 @@ let isSpinning = false;
 let currentRotation = 0;
 let animationFrameId = null;
 let lastDrawnRotation = -1;
+let lastDrawnOptionsLength = -1;
 
 // DOM Elemente
 const canvas = document.getElementById('wheelCanvas');
@@ -141,12 +142,14 @@ function escapeHtml(text) {
 // Rad zeichnen (OPTIMIERT)
 function drawWheel() {
     // WICHTIG: Nur während Animation optimieren, sonst immer neu zeichnen
-    if (!isSpinning && lastDrawnRotation === currentRotation && options.length > 0) {
-        // Während nicht-Animation: Nur bei exakt gleicher Rotation überspringen
+    // Prüfe ob sich die Anzahl der Optionen geändert hat
+    if (!isSpinning && lastDrawnRotation === currentRotation && lastDrawnOptionsLength === options.length && options.length > 0) {
+        // Während nicht-Animation: Nur bei exakt gleicher Rotation UND gleicher Optionsanzahl überspringen
         return;
     }
     
     lastDrawnRotation = currentRotation;
+    lastDrawnOptionsLength = options.length;
     
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
